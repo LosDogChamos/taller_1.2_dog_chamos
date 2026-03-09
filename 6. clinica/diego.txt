@@ -1,0 +1,133 @@
+-- ==============================
+-- ELIMINAR TABLAS SI EXISTEN
+-- ==============================
+
+DROP TABLE AsistenciaF CASCADE CONSTRAINTS;
+DROP TABLE CalendarioF CASCADE CONSTRAINTS;
+DROP TABLE AmbienteF CASCADE CONSTRAINTS;
+DROP TABLE EnfermeroF CASCADE CONSTRAINTS;
+
+
+-- ==============================
+-- TABLA ENFERMERO
+-- ==============================
+
+CREATE TABLE EnfermeroF
+(
+    idE NUMBER PRIMARY KEY,
+    tipoDocumE VARCHAR2(20) NOT NULL,
+    nroDocumE VARCHAR2(20) NOT NULL,
+    nombresE VARCHAR2(100) NOT NULL,
+    paternoE VARCHAR2(100) NOT NULL,
+    maternoE VARCHAR2(100) NOT NULL,
+    fechaNacimientoE DATE NOT NULL,
+    generoE VARCHAR2(10) NOT NULL
+);
+
+
+-- ==============================
+-- TABLA AMBIENTE
+-- ==============================
+
+CREATE TABLE AmbienteF
+(
+    idAmb NUMBER PRIMARY KEY,
+    nroAmb VARCHAR2(20) NOT NULL,
+    ubicacionAmb VARCHAR2(250) NOT NULL
+);
+
+
+-- ==============================
+-- TABLA CALENDARIO
+-- ==============================
+
+CREATE TABLE CalendarioF
+(
+    idC NUMBER PRIMARY KEY,
+    inicioC DATE NOT NULL,
+    finC DATE NOT NULL,
+    nombreC VARCHAR2(100) NOT NULL
+);
+
+
+-- ==============================
+-- TABLA ASISTENCIA
+-- ==============================
+
+CREATE TABLE AsistenciaF
+(
+    idA NUMBER PRIMARY KEY,
+    fechaA DATE NOT NULL,
+    diaA VARCHAR2(15) NOT NULL,
+    asistioA NUMBER(1) NOT NULL,
+    tardoA NUMBER(1) NOT NULL,
+    horaEntradaA VARCHAR2(5),
+    horaSalidaA VARCHAR2(5),
+    justificacionA VARCHAR2(250),
+    esDescansoA NUMBER(1) NOT NULL,
+    idEnfermero NUMBER NOT NULL,
+    idAmbiente NUMBER NOT NULL,
+    idCalendario NUMBER NOT NULL,
+
+    CONSTRAINT FK_Asistencia_EnfermeroF
+    FOREIGN KEY (idEnfermero)
+    REFERENCES EnfermeroF(idE),
+
+    CONSTRAINT FK_Asistencia_AmbienteF
+    FOREIGN KEY (idAmbiente)
+    REFERENCES AmbienteF(idAmb),
+
+    CONSTRAINT FK_Asistencia_CalendarioF
+    FOREIGN KEY (idCalendario)
+    REFERENCES CalendarioF(idC)
+);
+
+
+-- ==============================
+-- INSERTAR DATOS
+-- ==============================
+
+INSERT INTO EnfermeroF VALUES (1,'DNI','12345678','Juan','Perez','Gomez',DATE '1990-05-15','Masculino');
+INSERT INTO EnfermeroF VALUES (2,'DNI','87654321','Maria','Lopez','Martinez',DATE '1985-08-22','Femenino');
+INSERT INTO EnfermeroF VALUES (3,'DNI','45678912','Carlos','Rodriguez','Silva',DATE '1992-03-10','Masculino');
+INSERT INTO EnfermeroF VALUES (4,'DNI','78912345','Ana','Garcia','Torres',DATE '1988-11-30','Femenino');
+INSERT INTO EnfermeroF VALUES (5,'DNI','32165498','Pedro','Sanchez','Vega',DATE '1995-07-18','Masculino');
+
+
+INSERT INTO AmbienteF VALUES (1,'101','Pabellón A - Primer piso');
+INSERT INTO AmbienteF VALUES (2,'102','Pabellón A - Primer piso');
+INSERT INTO AmbienteF VALUES (3,'201','Pabellón A - Segundo piso');
+INSERT INTO AmbienteF VALUES (4,'301','Pabellón B - Primer piso');
+INSERT INTO AmbienteF VALUES (5,'302','Pabellón B - Primer piso');
+
+
+INSERT INTO CalendarioF VALUES (1,DATE '2024-01-01',DATE '2024-01-31','Enero 2024');
+INSERT INTO CalendarioF VALUES (2,DATE '2024-02-01',DATE '2024-02-29','Febrero 2024');
+INSERT INTO CalendarioF VALUES (3,DATE '2024-03-01',DATE '2024-03-31','Marzo 2024');
+INSERT INTO CalendarioF VALUES (4,DATE '2024-04-01',DATE '2024-04-30','Abril 2024');
+INSERT INTO CalendarioF VALUES (5,DATE '2024-05-01',DATE '2024-05-31','Mayo 2024');
+
+
+INSERT INTO AsistenciaF VALUES (1,DATE '2024-01-15','Lunes',1,0,'07:00','15:00',NULL,0,1,1,1);
+INSERT INTO AsistenciaF VALUES (2,DATE '2024-01-15','Lunes',1,1,'07:30','15:00','Retraso por tráfico',0,2,2,1);
+INSERT INTO AsistenciaF VALUES (3,DATE '2024-01-15','Lunes',0,0,NULL,NULL,'Licencia médica',0,3,3,1);
+INSERT INTO AsistenciaF VALUES (4,DATE '2024-01-16','Martes',1,0,'07:00','15:00',NULL,0,1,1,1);
+INSERT INTO AsistenciaF VALUES (5,DATE '2024-01-16','Martes',1,0,'07:00','15:00',NULL,0,2,2,1);
+INSERT INTO AsistenciaF VALUES (6,DATE '2024-01-16','Martes',1,0,'07:00','15:00',NULL,0,4,4,1);
+INSERT INTO AsistenciaF VALUES (7,DATE '2024-01-20','Sábado',0,0,NULL,NULL,NULL,1,1,1,1);
+INSERT INTO AsistenciaF VALUES (8,DATE '2024-01-20','Sábado',0,0,NULL,NULL,NULL,1,2,2,1);
+INSERT INTO AsistenciaF VALUES (9,DATE '2024-02-10','Sábado',1,0,'08:00','12:00',NULL,0,3,3,2);
+INSERT INTO AsistenciaF VALUES (10,DATE '2024-02-15','Jueves',1,0,'07:00','15:00',NULL,0,5,5,2);
+
+
+-- ==============================
+-- CONSULTAS
+-- ==============================
+
+SELECT * FROM EnfermeroF;
+
+SELECT * FROM AmbienteF;
+
+SELECT * FROM CalendarioF;
+
+SELECT * FROM AsistenciaF;

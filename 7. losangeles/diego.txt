@@ -1,0 +1,156 @@
+-- =================================
+-- ELIMINAR TABLAS SI EXISTEN
+-- =================================
+
+DROP TABLE DetalleG CASCADE CONSTRAINTS;
+DROP TABLE ComprobanteG CASCADE CONSTRAINTS;
+DROP TABLE ProductoG CASCADE CONSTRAINTS;
+DROP TABLE ClienteG CASCADE CONSTRAINTS;
+DROP TABLE CategoriaG CASCADE CONSTRAINTS;
+
+
+-- =================================
+-- TABLA CATEGORIA
+-- =================================
+
+CREATE TABLE CategoriaG
+(
+    idCat NUMBER PRIMARY KEY,
+    nombreCat VARCHAR2(100) NOT NULL,
+    descripcionCat VARCHAR2(250)
+);
+
+
+-- =================================
+-- TABLA PRODUCTO
+-- =================================
+
+CREATE TABLE ProductoG
+(
+    idP NUMBER PRIMARY KEY,
+    nombreP VARCHAR2(100) NOT NULL,
+    descripcionP VARCHAR2(250),
+    precioReferencialP NUMBER(10,2) NOT NULL,
+    idCat NUMBER NOT NULL,
+
+    CONSTRAINT FK_Producto_CategoriaG
+    FOREIGN KEY (idCat)
+    REFERENCES CategoriaG(idCat)
+);
+
+
+-- =================================
+-- TABLA CLIENTE
+-- =================================
+
+CREATE TABLE ClienteG
+(
+    idC NUMBER PRIMARY KEY,
+    tipoDocumC VARCHAR2(20) NOT NULL,
+    nroDocumC VARCHAR2(20) NOT NULL,
+    nombresC VARCHAR2(100) NOT NULL,
+    paternoC VARCHAR2(100) NOT NULL,
+    maternoC VARCHAR2(100) NOT NULL,
+    celularC VARCHAR2(9) NOT NULL
+);
+
+
+-- =================================
+-- TABLA COMPROBANTE
+-- =================================
+
+CREATE TABLE ComprobanteG
+(
+    idComp NUMBER PRIMARY KEY,
+    fechaHoraComp DATE NOT NULL,
+    totalComp NUMBER(10,2) NOT NULL,
+    idC NUMBER NOT NULL,
+
+    CONSTRAINT FK_Comprobante_ClienteG
+    FOREIGN KEY (idC)
+    REFERENCES ClienteG(idC)
+);
+
+
+-- =================================
+-- TABLA DETALLE
+-- =================================
+
+CREATE TABLE DetalleG
+(
+    idDet NUMBER PRIMARY KEY,
+    cantidadDet NUMBER NOT NULL,
+    precioRealUnitarioDet NUMBER(10,2) NOT NULL,
+    subtotalDet NUMBER(10,2) NOT NULL,
+    idComp NUMBER NOT NULL,
+    idP NUMBER NOT NULL,
+
+    CONSTRAINT FK_Detalle_ComprobanteG
+    FOREIGN KEY (idComp)
+    REFERENCES ComprobanteG(idComp),
+
+    CONSTRAINT FK_Detalle_ProductoG
+    FOREIGN KEY (idP)
+    REFERENCES ProductoG(idP)
+);
+
+
+-- =================================
+-- INSERTAR DATOS
+-- =================================
+
+INSERT INTO CategoriaG VALUES (1,'Electrónica','Productos electrónicos y gadgets');
+INSERT INTO CategoriaG VALUES (2,'Ropa','Prendas de vestir para todas las edades');
+INSERT INTO CategoriaG VALUES (3,'Hogar','Artículos para el hogar y decoración');
+INSERT INTO CategoriaG VALUES (4,'Deportes','Equipamiento y ropa deportiva');
+INSERT INTO CategoriaG VALUES (5,'Libros','Libros y material de lectura');
+
+
+INSERT INTO ProductoG VALUES (1,'Smartphone X','Teléfono de última generación',1500,1);
+INSERT INTO ProductoG VALUES (2,'Laptop Pro','Laptop para profesionales',3200,1);
+INSERT INTO ProductoG VALUES (3,'Camisa casual','Camisa de algodón para hombre',89.90,2);
+INSERT INTO ProductoG VALUES (4,'Vestido verano','Vestido ligero para dama',129.90,2);
+INSERT INTO ProductoG VALUES (5,'Juego de sábanas','Sábanas de 3 piezas',159.90,3);
+INSERT INTO ProductoG VALUES (6,'Pelota fútbol','Pelota profesional',79.90,4);
+INSERT INTO ProductoG VALUES (7,'Libro SQL','Aprende SQL desde cero',65,5);
+
+
+INSERT INTO ClienteG VALUES (1,'DNI','12345678','Juan','Perez','Gomez','987654321');
+INSERT INTO ClienteG VALUES (2,'DNI','87654321','Maria','Lopez','Martinez','976543210');
+INSERT INTO ClienteG VALUES (3,'DNI','45678912','Carlos','Rodriguez','Silva','965432109');
+INSERT INTO ClienteG VALUES (4,'DNI','78912345','Ana','Garcia','Torres','954321098');
+INSERT INTO ClienteG VALUES (5,'DNI','32165498','Pedro','Sanchez','Vega','943210987');
+
+
+INSERT INTO ComprobanteG VALUES (1,TO_DATE('2024-01-15 10:30','YYYY-MM-DD HH24:MI'),1589.90,1);
+INSERT INTO ComprobanteG VALUES (2,TO_DATE('2024-01-16 14:20','YYYY-MM-DD HH24:MI'),219.80,2);
+INSERT INTO ComprobanteG VALUES (3,TO_DATE('2024-01-17 09:15','YYYY-MM-DD HH24:MI'),3225.00,3);
+INSERT INTO ComprobanteG VALUES (4,TO_DATE('2024-01-18 16:45','YYYY-MM-DD HH24:MI'),159.90,4);
+INSERT INTO ComprobanteG VALUES (5,TO_DATE('2024-01-19 11:30','YYYY-MM-DD HH24:MI'),450.00,5);
+
+
+INSERT INTO DetalleG VALUES (1,1,1500,1500,1,1);
+INSERT INTO DetalleG VALUES (2,1,89.90,89.90,1,3);
+INSERT INTO DetalleG VALUES (3,2,65,130,2,7);
+INSERT INTO DetalleG VALUES (4,1,89.90,89.90,2,3);
+INSERT INTO DetalleG VALUES (5,1,3200,3200,3,2);
+INSERT INTO DetalleG VALUES (6,1,25,25,3,5);
+INSERT INTO DetalleG VALUES (7,1,159.90,159.90,4,5);
+INSERT INTO DetalleG VALUES (8,1,79.90,79.90,5,6);
+INSERT INTO DetalleG VALUES (9,2,129.90,259.80,5,4);
+INSERT INTO DetalleG VALUES (10,1,110.30,110.30,5,3);
+
+
+-- =================================
+-- CONSULTAS
+-- =================================
+
+SELECT * FROM CategoriaG;
+
+SELECT * FROM ProductoG;
+
+SELECT * FROM ClienteG;
+
+SELECT * FROM ComprobanteG;
+
+SELECT * FROM DetalleG;

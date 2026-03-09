@@ -1,0 +1,106 @@
+-- =================================
+-- ELIMINAR TABLAS SI EXISTEN
+-- =================================
+DROP TABLE IF EXISTS Asistencia CASCADE;
+DROP TABLE IF EXISTS Empleado CASCADE;
+DROP TABLE IF EXISTS Turno CASCADE;
+DROP TABLE IF EXISTS Año CASCADE;
+
+-- =================================
+-- TABLA AÑO
+-- =================================
+CREATE TABLE Año (
+    idAño SERIAL PRIMARY KEY,
+    inicioAño DATE NOT NULL,
+    finAño DATE NOT NULL
+);
+
+-- =================================
+-- TABLA TURNO
+-- =================================
+CREATE TABLE Turno (
+    idT SERIAL PRIMARY KEY,
+    nombreT VARCHAR(50) NOT NULL,
+    inicioT TIME NOT NULL,
+    finT TIME NOT NULL,
+    idAño INTEGER NOT NULL,
+    CONSTRAINT FK_Turno_Año
+    FOREIGN KEY (idAño) REFERENCES Año(idAño)
+);
+
+-- =================================
+-- TABLA EMPLEADO
+-- =================================
+CREATE TABLE Empleado (
+    idE SERIAL PRIMARY KEY,
+    tipoDocumento VARCHAR(20) NOT NULL,
+    nroDocumento VARCHAR(20) NOT NULL,
+    nombresE VARCHAR(100) NOT NULL,
+    paternoE VARCHAR(100) NOT NULL,
+    maternoE VARCHAR(100) NOT NULL,
+    celularE VARCHAR(9) NOT NULL,
+    idSupervisor INTEGER NULL,
+    CONSTRAINT FK_Empleado_Supervisor
+    FOREIGN KEY (idSupervisor) REFERENCES Empleado(idE)
+);
+
+-- =================================
+-- TABLA ASISTENCIA
+-- =================================
+CREATE TABLE Asistencia (
+    idA SERIAL PRIMARY KEY,
+    fechaA DATE NOT NULL,
+    diaA VARCHAR(15) NOT NULL,
+    esFeriadoA BOOLEAN NOT NULL,
+    asistioA BOOLEAN NOT NULL,
+    tardoA BOOLEAN NOT NULL,
+    horaEntradaA TIME,
+    horaSalidaA TIME,
+    idE INTEGER NOT NULL,
+    idT INTEGER NOT NULL,
+    CONSTRAINT FK_Asistencia_Empleado
+    FOREIGN KEY (idE) REFERENCES Empleado(idE),
+    CONSTRAINT FK_Asistencia_Turno
+    FOREIGN KEY (idT) REFERENCES Turno(idT)
+);
+
+-- =================================
+-- INSERTAR DATOS
+-- =================================
+INSERT INTO Año (inicioAño, finAño) VALUES
+('2026-01-01', '2026-12-31'),
+('2025-01-01', '2025-12-31');
+
+INSERT INTO Turno (nombreT, inicioT, finT, idAño) VALUES
+('Mañana', '08:00:00', '16:00:00', 1),
+('Tarde', '14:00:00', '22:00:00', 1),
+('Noche', '22:00:00', '06:00:00', 1),
+('Mañana', '08:00:00', '16:00:00', 2),
+('Tarde', '14:00:00', '22:00:00', 2),
+('Noche', '22:00:00', '06:00:00', 2);
+
+INSERT INTO Empleado (tipoDocumento, nroDocumento, nombresE, paternoE, maternoE, celularE, idSupervisor) VALUES
+('DNI', '12345678', 'Juan', 'Perez', 'Gomez', '987654321', NULL),
+('DNI', '87654321', 'Maria', 'Lopez', 'Martinez', '976543210', 1),
+('DNI', '45678912', 'Carlos', 'Rodriguez', 'Silva', '965432109', 1),
+('DNI', '78912345', 'Ana', 'Garcia', 'Torres', '954321098', 2),
+('DNI', '32165498', 'Pedro', 'Sanchez', 'Vega', '943210987', 2);
+
+INSERT INTO Asistencia (fechaA, diaA, esFeriadoA, asistioA, tardoA, horaEntradaA, horaSalidaA, idE, idT) VALUES
+('2026-03-01', 'Lunes', FALSE, TRUE, FALSE, '08:00:00', '16:00:00', 1, 1),
+('2026-03-01', 'Lunes', FALSE, TRUE, FALSE, '08:05:00', '16:00:00', 2, 1),
+('2026-03-01', 'Lunes', FALSE, TRUE, TRUE, '14:10:00', '22:00:00', 3, 2),
+('2026-03-02', 'Martes', FALSE, TRUE, FALSE, '08:00:00', '16:00:00', 1, 1),
+('2026-03-02', 'Martes', FALSE, FALSE, FALSE, NULL, NULL, 2, 1),
+('2026-03-02', 'Martes', FALSE, TRUE, FALSE, '14:00:00', '22:00:00', 3, 2),
+('2026-03-03', 'Miércoles', FALSE, TRUE, FALSE, '08:00:00', '16:00:00', 1, 1),
+('2026-03-03', 'Miércoles', FALSE, TRUE, TRUE, '08:15:00', '16:00:00', 2, 1),
+('2026-03-03', 'Miércoles', FALSE, TRUE, FALSE, '14:00:00', '22:00:00', 3, 2);
+
+-- =================================
+-- CONSULTAS
+-- =================================
+SELECT 'AÑO' AS Tabla, * FROM Año;
+SELECT 'TURNO' AS Tabla, * FROM Turno;
+SELECT 'EMPLEADO' AS Tabla, * FROM Empleado;
+SELECT 'ASISTENCIA' AS Tabla, * FROM Asistencia;

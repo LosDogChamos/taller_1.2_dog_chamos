@@ -1,0 +1,76 @@
+-- 1. Limpieza de tablas previas en ejercicio5
+SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS detalleDelIngresoSalida;
+DROP TABLE IF EXISTS Comprobante;
+DROP TABLE IF EXISTS OrdenDeCompra;
+DROP TABLE IF EXISTS Cliente;
+DROP TABLE IF EXISTS Electrodomestico;
+DROP TABLE IF EXISTS Proveedor;
+SET FOREIGN_KEY_CHECKS = 1;
+
+-- 2. Creación de tablas adaptadas a MySQL
+CREATE TABLE Proveedor (
+    idP INT AUTO_INCREMENT PRIMARY KEY,
+    razonSocialP VARCHAR(200) NOT NULL,
+    direccionP VARCHAR(250) NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE Electrodomestico (
+    idE INT AUTO_INCREMENT PRIMARY KEY,
+    nombreE VARCHAR(100) NOT NULL,
+    marcaE VARCHAR(100) NOT NULL,
+    modeloE VARCHAR(100) NOT NULL,
+    precioVentaE DECIMAL(10, 2) NOT NULL,
+    precioCompraE DECIMAL(10, 2) NOT NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE Cliente (
+    idC INT AUTO_INCREMENT PRIMARY KEY,
+    tipoDocumC VARCHAR(20) NOT NULL,
+    nroDocumC VARCHAR(20) NOT NULL,
+    nombresC VARCHAR(100) NOT NULL,
+    paternoC VARCHAR(100) NOT NULL,
+    maternoC VARCHAR(100) NOT NULL,
+    celularC VARCHAR(9) NOT NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE OrdenDeCompra (
+    idOrden INT AUTO_INCREMENT PRIMARY KEY,
+    fechaHoraOrden DATETIME NOT NULL,
+    totalOrden DECIMAL(10, 2) NOT NULL,
+    idProveedor INT NOT NULL,
+    CONSTRAINT FK_Orden_Proveedor FOREIGN KEY (idProveedor) REFERENCES Proveedor(idP)
+) ENGINE=InnoDB;
+
+CREATE TABLE Comprobante (
+    idComp INT AUTO_INCREMENT PRIMARY KEY,
+    tipoComp VARCHAR(50) NOT NULL,
+    fechaHoraComp DATETIME NOT NULL,
+    totalComp DECIMAL(10, 2) NOT NULL,
+    idCliente INT NOT NULL,
+    CONSTRAINT FK_Comp_Cliente FOREIGN KEY (idCliente) REFERENCES Cliente(idC)
+) ENGINE=InnoDB;
+
+CREATE TABLE detalleDelIngresoSalida (
+    idDet INT AUTO_INCREMENT PRIMARY KEY,
+    tipoDet VARCHAR(20) NOT NULL,
+    subtotalDet DECIMAL(10, 2) NOT NULL,
+    cantidadDet INT NOT NULL,
+    idElectrodomestico INT NOT NULL,
+    idOrden INT NULL,
+    idComprobante INT NULL,
+    CONSTRAINT FK_Det_Electro FOREIGN KEY (idElectrodomestico) REFERENCES Electrodomestico(idE),
+    CONSTRAINT FK_Det_Orden FOREIGN KEY (idOrden) REFERENCES OrdenDeCompra(idOrden),
+    CONSTRAINT FK_Det_Comp_E5 FOREIGN KEY (idComprobante) REFERENCES Comprobante(idComp)
+) ENGINE=InnoDB;
+
+-- 3. Inserción de Datos
+INSERT INTO Proveedor (razonSocialP, direccionP) VALUES ('ElectroImport SAC', 'Av. Industrial 123, Lima');
+INSERT INTO Electrodomestico (nombreE, marcaE, modeloE, precioVentaE, precioCompraE) VALUES ('Refrigeradora', 'LG', 'GR-452SL', 2500.00, 1800.00);
+INSERT INTO Cliente (tipoDocumC, nroDocumC, nombresC, paternoC, maternoC, celularC) VALUES ('DNI', '12345678', 'Juan', 'Perez', 'Gomez', '987654321');
+INSERT INTO OrdenDeCompra (fechaHoraOrden, totalOrden, idProveedor) VALUES ('2026-02-01 09:30:00', 5400.00, 1);
+INSERT INTO Comprobante (tipoComp, fechaHoraComp, totalComp, idCliente) VALUES ('BOLETA', '2026-02-02 15:30:00', 2500.00, 1);
+INSERT INTO detalleDelIngresoSalida (tipoDet, subtotalDet, cantidadDet, idElectrodomestico, idOrden, idComprobante) VALUES ('INGRESO', 3600.00, 2, 1, 1, NULL);
+
+-- 4. Verificación
+SELECT 'TABLAS CREADAS EN EJERCICIO 5' AS Mensaje;

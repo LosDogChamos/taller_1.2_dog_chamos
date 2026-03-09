@@ -1,0 +1,70 @@
+-- 1. Limpieza de tablas previas en ejercicio6
+SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS Asistencia;
+DROP TABLE IF EXISTS Calendario;
+DROP TABLE IF EXISTS Ambiente;
+DROP TABLE IF EXISTS Enfermero;
+SET FOREIGN_KEY_CHECKS = 1;
+
+-- 2. Creación de tablas adaptadas a MySQL
+CREATE TABLE Enfermero (
+    idE INT AUTO_INCREMENT PRIMARY KEY,
+    tipoDocumE VARCHAR(20) NOT NULL,
+    nroDocumE VARCHAR(20) NOT NULL,
+    nombresE VARCHAR(100) NOT NULL,
+    paternoE VARCHAR(100) NOT NULL,
+    maternoE VARCHAR(100) NOT NULL,
+    fechaNacimientoE DATE NOT NULL,
+    generoE VARCHAR(10) NOT NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE Ambiente (
+    idAmb INT AUTO_INCREMENT PRIMARY KEY,
+    nroAmb VARCHAR(20) NOT NULL,
+    ubicacionAmb VARCHAR(250) NOT NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE Calendario (
+    idC INT AUTO_INCREMENT PRIMARY KEY,
+    inicioC DATE NOT NULL,
+    finC DATE NOT NULL,
+    nombreC VARCHAR(100) NOT NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE Asistencia (
+    idA INT AUTO_INCREMENT PRIMARY KEY,
+    fechaA DATE NOT NULL,
+    diaA VARCHAR(15) NOT NULL,
+    asistioA TINYINT(1) NOT NULL, -- MySQL usa TINYINT en lugar de BIT
+    tardoA TINYINT(1) NOT NULL,
+    horaEntradaA TIME NULL,
+    horaSalidaA TIME NULL,
+    justificacionA VARCHAR(250) NULL,
+    esDescansoA TINYINT(1) NOT NULL,
+    idEnfermero INT NOT NULL,
+    idAmbiente INT NOT NULL,
+    idCalendario INT NOT NULL,
+    CONSTRAINT FK_Asistencia_Enfermero FOREIGN KEY (idEnfermero) REFERENCES Enfermero(idE),
+    CONSTRAINT FK_Asistencia_Ambiente FOREIGN KEY (idAmbiente) REFERENCES Ambiente(idAmb),
+    CONSTRAINT FK_Asistencia_Calendario FOREIGN KEY (idCalendario) REFERENCES Calendario(idC)
+) ENGINE=InnoDB;
+
+-- 3. Inserción de Datos
+INSERT INTO Enfermero (tipoDocumE, nroDocumE, nombresE, paternoE, maternoE, fechaNacimientoE, generoE) VALUES
+('DNI', '12345678', 'Juan', 'Perez', 'Gomez', '1990-05-15', 'Masculino'),
+('DNI', '87654321', 'Maria', 'Lopez', 'Martinez', '1985-08-22', 'Femenino');
+
+INSERT INTO Ambiente (nroAmb, ubicacionAmb) VALUES
+('101', 'Pabellón A - Primer piso'),
+('102', 'Pabellón A - Primer piso');
+
+INSERT INTO Calendario (inicioC, finC, nombreC) VALUES
+('2024-01-01', '2024-01-31', 'Enero 2024');
+
+INSERT INTO Asistencia (fechaA, diaA, asistioA, tardoA, horaEntradaA, horaSalidaA, justificacionA, esDescansoA, idEnfermero, idAmbiente, idCalendario) VALUES
+('2026-03-01', 'Lunes', 1, 0, '07:00:00', '15:00:00', NULL, 0, 1, 1, 1);
+
+-- 4. Verificación
+SELECT 'ENFERMERO' AS Tabla, COUNT(*) AS Cantidad FROM Enfermero
+UNION ALL
+SELECT 'AMBIENTE', COUNT(*) FROM Ambiente;

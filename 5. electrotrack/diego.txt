@@ -1,0 +1,188 @@
+-- ==============================
+-- ELIMINAR TABLAS SI EXISTEN
+-- ==============================
+
+DROP TABLE DetalleIngresoSalidaE CASCADE CONSTRAINTS;
+DROP TABLE ComprobanteE CASCADE CONSTRAINTS;
+DROP TABLE OrdenDeCompraE CASCADE CONSTRAINTS;
+DROP TABLE ClienteE CASCADE CONSTRAINTS;
+DROP TABLE ElectrodomesticoE CASCADE CONSTRAINTS;
+DROP TABLE ProveedorE CASCADE CONSTRAINTS;
+
+
+-- ==============================
+-- TABLA PROVEEDOR
+-- ==============================
+
+CREATE TABLE ProveedorE
+(
+    idP NUMBER PRIMARY KEY,
+    razonSocialP VARCHAR2(200) NOT NULL,
+    direccionP VARCHAR2(250)
+);
+
+
+-- ==============================
+-- TABLA ELECTRODOMESTICO
+-- ==============================
+
+CREATE TABLE ElectrodomesticoE
+(
+    idE NUMBER PRIMARY KEY,
+    nombreE VARCHAR2(100) NOT NULL,
+    marcaE VARCHAR2(100) NOT NULL,
+    modeloE VARCHAR2(100) NOT NULL,
+    precioVentaE NUMBER(10,2) NOT NULL,
+    precioCompraE NUMBER(10,2) NOT NULL
+);
+
+
+-- ==============================
+-- TABLA CLIENTE
+-- ==============================
+
+CREATE TABLE ClienteE
+(
+    idC NUMBER PRIMARY KEY,
+    tipoDocumC VARCHAR2(20) NOT NULL,
+    nroDocumC VARCHAR2(20) NOT NULL,
+    nombresC VARCHAR2(100) NOT NULL,
+    paternoC VARCHAR2(100) NOT NULL,
+    maternoC VARCHAR2(100) NOT NULL,
+    celularC VARCHAR2(9) NOT NULL
+);
+
+
+-- ==============================
+-- TABLA ORDEN DE COMPRA
+-- ==============================
+
+CREATE TABLE OrdenDeCompraE
+(
+    idOrden NUMBER PRIMARY KEY,
+    fechaHoraOrden DATE NOT NULL,
+    totalOrden NUMBER(10,2) NOT NULL,
+    idProveedor NUMBER NOT NULL,
+
+    CONSTRAINT FK_OrdenProveedorE
+    FOREIGN KEY (idProveedor)
+    REFERENCES ProveedorE(idP)
+);
+
+
+-- ==============================
+-- TABLA COMPROBANTE
+-- ==============================
+
+CREATE TABLE ComprobanteE
+(
+    idComp NUMBER PRIMARY KEY,
+    tipoComp VARCHAR2(50) NOT NULL,
+    fechaHoraComp DATE NOT NULL,
+    totalComp NUMBER(10,2) NOT NULL,
+    idCliente NUMBER NOT NULL,
+
+    CONSTRAINT FK_ComprobanteClienteE
+    FOREIGN KEY (idCliente)
+    REFERENCES ClienteE(idC)
+);
+
+
+-- ==============================
+-- TABLA DETALLE INGRESO SALIDA
+-- ==============================
+
+CREATE TABLE DetalleIngresoSalidaE
+(
+    idDet NUMBER PRIMARY KEY,
+    tipoDet VARCHAR2(20) NOT NULL,
+    subtotalDet NUMBER(10,2) NOT NULL,
+    cantidadDet NUMBER NOT NULL,
+    idElectrodomestico NUMBER NOT NULL,
+    idOrden NUMBER,
+    idComprobante NUMBER,
+
+    CONSTRAINT FK_DetalleElectrodomesticoE
+    FOREIGN KEY (idElectrodomestico)
+    REFERENCES ElectrodomesticoE(idE),
+
+    CONSTRAINT FK_DetalleOrdenE
+    FOREIGN KEY (idOrden)
+    REFERENCES OrdenDeCompraE(idOrden),
+
+    CONSTRAINT FK_DetalleComprobanteE
+    FOREIGN KEY (idComprobante)
+    REFERENCES ComprobanteE(idComp),
+
+    CONSTRAINT CK_TipoDetalleE CHECK (
+        (tipoDet = 'INGRESO' AND idOrden IS NOT NULL AND idComprobante IS NULL) OR
+        (tipoDet = 'SALIDA' AND idOrden IS NULL AND idComprobante IS NOT NULL)
+    )
+);
+
+
+-- ==============================
+-- INSERTAR DATOS
+-- ==============================
+
+INSERT INTO ProveedorE VALUES (1,'ElectroImport SAC','Av. Industrial 123, Lima');
+INSERT INTO ProveedorE VALUES (2,'Distribuidora LG Peru','Calle Los Olivos 456, Arequipa');
+INSERT INTO ProveedorE VALUES (3,'Samsung Electronics Peru','Av. La Marina 789, Lima');
+INSERT INTO ProveedorE VALUES (4,'Whirlpool Peru SAC','Jr. Comercio 321, Trujillo');
+INSERT INTO ProveedorE VALUES (5,'Mabe Peru SA','Av. Universitaria 654, Lima');
+
+
+INSERT INTO ElectrodomesticoE VALUES (1,'Refrigeradora','LG','GR-452SL',2500,1800);
+INSERT INTO ElectrodomesticoE VALUES (2,'Lavadora','Samsung','WW80K54',1800,1300);
+INSERT INTO ElectrodomesticoE VALUES (3,'Microondas','Whirlpool','MW20XT',450,320);
+INSERT INTO ElectrodomesticoE VALUES (4,'Cocina','Mabe','EM-56GF',1200,850);
+INSERT INTO ElectrodomesticoE VALUES (5,'Televisor','LG','55UN7400',3200,2400);
+INSERT INTO ElectrodomesticoE VALUES (6,'Refrigeradora','Samsung','RT38K5',2800,2000);
+INSERT INTO ElectrodomesticoE VALUES (7,'Lavadora','Whirlpool','7MWT98',1600,1150);
+
+
+INSERT INTO ClienteE VALUES (1,'DNI','12345678','Juan','Perez','Gomez','987654321');
+INSERT INTO ClienteE VALUES (2,'DNI','87654321','Maria','Lopez','Martinez','976543210');
+INSERT INTO ClienteE VALUES (3,'DNI','45678912','Carlos','Rodriguez','Silva','965432109');
+INSERT INTO ClienteE VALUES (4,'DNI','78912345','Ana','Garcia','Torres','954321098');
+INSERT INTO ClienteE VALUES (5,'DNI','32165498','Pedro','Sanchez','Vega','943210987');
+
+
+INSERT INTO OrdenDeCompraE VALUES (1,TO_DATE('2024-02-01 09:30','YYYY-MM-DD HH24:MI'),5400,2);
+INSERT INTO OrdenDeCompraE VALUES (2,TO_DATE('2024-02-05 11:15','YYYY-MM-DD HH24:MI'),4950,3);
+INSERT INTO OrdenDeCompraE VALUES (3,TO_DATE('2024-02-10 14:20','YYYY-MM-DD HH24:MI'),2750,4);
+INSERT INTO OrdenDeCompraE VALUES (4,TO_DATE('2024-02-15 10:45','YYYY-MM-DD HH24:MI'),3400,5);
+
+
+INSERT INTO ComprobanteE VALUES (1,'BOLETA',TO_DATE('2024-02-02 15:30','YYYY-MM-DD HH24:MI'),2500,1);
+INSERT INTO ComprobanteE VALUES (2,'FACTURA',TO_DATE('2024-02-06 16:45','YYYY-MM-DD HH24:MI'),4600,2);
+INSERT INTO ComprobanteE VALUES (3,'BOLETA',TO_DATE('2024-02-12 12:20','YYYY-MM-DD HH24:MI'),2050,3);
+INSERT INTO ComprobanteE VALUES (4,'FACTURA',TO_DATE('2024-02-18 18:10','YYYY-MM-DD HH24:MI'),3200,4);
+
+
+INSERT INTO DetalleIngresoSalidaE VALUES (1,'INGRESO',3600,2,1,1,NULL);
+INSERT INTO DetalleIngresoSalidaE VALUES (2,'INGRESO',1800,1,5,1,NULL);
+INSERT INTO DetalleIngresoSalidaE VALUES (3,'INGRESO',2600,2,2,2,NULL);
+INSERT INTO DetalleIngresoSalidaE VALUES (4,'INGRESO',2000,1,6,2,NULL);
+INSERT INTO DetalleIngresoSalidaE VALUES (5,'INGRESO',1600,1,3,3,NULL);
+INSERT INTO DetalleIngresoSalidaE VALUES (6,'INGRESO',1150,1,7,3,NULL);
+INSERT INTO DetalleIngresoSalidaE VALUES (7,'INGRESO',3400,4,4,4,NULL);
+
+INSERT INTO DetalleIngresoSalidaE VALUES (8,'SALIDA',2500,1,1,NULL,1);
+INSERT INTO DetalleIngresoSalidaE VALUES (9,'SALIDA',3200,1,5,NULL,2);
+INSERT INTO DetalleIngresoSalidaE VALUES (10,'SALIDA',1400,1,2,NULL,2);
+INSERT INTO DetalleIngresoSalidaE VALUES (11,'SALIDA',450,1,3,NULL,3);
+INSERT INTO DetalleIngresoSalidaE VALUES (12,'SALIDA',1600,1,7,NULL,3);
+INSERT INTO DetalleIngresoSalidaE VALUES (13,'SALIDA',3200,1,5,NULL,4);
+
+
+-- ==============================
+-- CONSULTAS
+-- ==============================
+
+SELECT * FROM ProveedorE;
+SELECT * FROM ElectrodomesticoE;
+SELECT * FROM ClienteE;
+SELECT * FROM OrdenDeCompraE;
+SELECT * FROM ComprobanteE;
+SELECT * FROM DetalleIngresoSalidaE;

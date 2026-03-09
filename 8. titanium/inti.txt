@@ -1,0 +1,108 @@
+-- =================================
+-- ELIMINAR TABLAS SI EXISTEN
+-- =================================
+DROP TABLE IF EXISTS Asistencia CASCADE;
+DROP TABLE IF EXISTS Calendario CASCADE;
+DROP TABLE IF EXISTS Ambiente CASCADE;
+DROP TABLE IF EXISTS Enfermero CASCADE;
+
+-- =================================
+-- TABLA ENFERMERO
+-- =================================
+CREATE TABLE Enfermero (
+    idE SERIAL PRIMARY KEY,
+    tipoDocumE VARCHAR(20) NOT NULL,
+    nroDocumE VARCHAR(20) NOT NULL,
+    nombresE VARCHAR(100) NOT NULL,
+    paternoE VARCHAR(100) NOT NULL,
+    maternoE VARCHAR(100) NOT NULL,
+    fechaNacimientoE DATE NOT NULL,
+    generoE VARCHAR(10) NOT NULL
+);
+
+-- =================================
+-- TABLA AMBIENTE
+-- =================================
+CREATE TABLE Ambiente (
+    idAmb SERIAL PRIMARY KEY,
+    nroAmb VARCHAR(20) NOT NULL,
+    ubicacionAmb VARCHAR(250) NOT NULL
+);
+
+-- =================================
+-- TABLA CALENDARIO
+-- =================================
+CREATE TABLE Calendario (
+    idC SERIAL PRIMARY KEY,
+    inicioC DATE NOT NULL,
+    finC DATE NOT NULL,
+    nombreC VARCHAR(100) NOT NULL
+);
+
+-- =================================
+-- TABLA ASISTENCIA
+-- =================================
+CREATE TABLE Asistencia (
+    idA SERIAL PRIMARY KEY,
+    fechaA DATE NOT NULL,
+    diaA VARCHAR(15) NOT NULL,
+    asistioA BOOLEAN NOT NULL,
+    tardoA BOOLEAN NOT NULL,
+    horaEntradaA TIME,
+    horaSalidaA TIME,
+    justificacionA VARCHAR(250),
+    esDescansoA BOOLEAN NOT NULL,
+    idEnfermero INTEGER NOT NULL,
+    idAmbiente INTEGER NOT NULL,
+    idCalendario INTEGER NOT NULL,
+    CONSTRAINT FK_Asistencia_Enfermero
+    FOREIGN KEY (idEnfermero) REFERENCES Enfermero(idE),
+    CONSTRAINT FK_Asistencia_Ambiente
+    FOREIGN KEY (idAmbiente) REFERENCES Ambiente(idAmb),
+    CONSTRAINT FK_Asistencia_Calendario
+    FOREIGN KEY (idCalendario) REFERENCES Calendario(idC)
+);
+
+-- =================================
+-- INSERTAR DATOS
+-- =================================
+INSERT INTO Enfermero (tipoDocumE, nroDocumE, nombresE, paternoE, maternoE, fechaNacimientoE, generoE) VALUES
+('DNI', '12345678', 'Juan', 'Perez', 'Gomez', '1990-05-15', 'Masculino'),
+('DNI', '87654321', 'Maria', 'Lopez', 'Martinez', '1985-08-22', 'Femenino'),
+('DNI', '45678912', 'Carlos', 'Rodriguez', 'Silva', '1992-03-10', 'Masculino'),
+('DNI', '78912345', 'Ana', 'Garcia', 'Torres', '1988-11-30', 'Femenino'),
+('DNI', '32165498', 'Pedro', 'Sanchez', 'Vega', '1995-07-18', 'Masculino');
+
+INSERT INTO Ambiente (nroAmb, ubicacionAmb) VALUES
+('101', 'Pabellón A - Primer piso'),
+('102', 'Pabellón A - Primer piso'),
+('201', 'Pabellón A - Segundo piso'),
+('301', 'Pabellón B - Primer piso'),
+('302', 'Pabellón B - Primer piso');
+
+INSERT INTO Calendario (inicioC, finC, nombreC) VALUES
+('2024-01-01', '2024-01-31', 'Enero 2024'),
+('2024-02-01', '2024-02-29', 'Febrero 2024'),
+('2024-03-01', '2024-03-31', 'Marzo 2024'),
+('2024-04-01', '2024-04-30', 'Abril 2024'),
+('2024-05-01', '2024-05-31', 'Mayo 2024');
+
+INSERT INTO Asistencia (fechaA, diaA, asistioA, tardoA, horaEntradaA, horaSalidaA, justificacionA, esDescansoA, idEnfermero, idAmbiente, idCalendario) VALUES
+('2024-01-15', 'Lunes', TRUE, FALSE, '07:00', '15:00', NULL, FALSE, 1, 1, 1),
+('2024-01-15', 'Lunes', TRUE, TRUE, '07:30', '15:00', 'Retraso por tráfico', FALSE, 2, 2, 1),
+('2024-01-15', 'Lunes', FALSE, FALSE, NULL, NULL, 'Licencia médica', FALSE, 3, 3, 1),
+('2024-01-16', 'Martes', TRUE, FALSE, '07:00', '15:00', NULL, FALSE, 1, 1, 1),
+('2024-01-16', 'Martes', TRUE, FALSE, '07:00', '15:00', NULL, FALSE, 2, 2, 1),
+('2024-01-16', 'Martes', TRUE, FALSE, '07:00', '15:00', NULL, FALSE, 4, 4, 1),
+('2024-01-20', 'Sábado', FALSE, FALSE, NULL, NULL, NULL, TRUE, 1, 1, 1),
+('2024-01-20', 'Sábado', FALSE, FALSE, NULL, NULL, NULL, TRUE, 2, 2, 1),
+('2024-02-10', 'Sábado', TRUE, FALSE, '08:00', '12:00', NULL, FALSE, 3, 3, 2),
+('2024-02-15', 'Jueves', TRUE, FALSE, '07:00', '15:00', NULL, FALSE, 5, 5, 2);
+
+-- =================================
+-- CONSULTAS
+-- =================================
+SELECT 'ENFERMERO' AS Tabla, * FROM Enfermero;
+SELECT 'AMBIENTE' AS Tabla, * FROM Ambiente;
+SELECT 'CALENDARIO' AS Tabla, * FROM Calendario;
+SELECT 'ASISTENCIA' AS Tabla, * FROM Asistencia;

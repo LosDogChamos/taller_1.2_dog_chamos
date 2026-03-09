@@ -1,0 +1,104 @@
+-- 1. Preparación del entorno
+DROP DATABASE IF EXISTS SuperGiros;
+CREATE DATABASE SuperGiros;
+USE SuperGiros;
+
+-- 2. Creación de tablas
+CREATE TABLE Banco (
+    idB INT AUTO_INCREMENT PRIMARY KEY,
+    nombreB VARCHAR(100) NOT NULL,
+    paginaWebB VARCHAR(200) NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE Cliente (
+    idC INT AUTO_INCREMENT PRIMARY KEY,
+    tipoDocumentC VARCHAR(20) NOT NULL,
+    nroDocumentC VARCHAR(20) NOT NULL,
+    nombresC VARCHAR(100) NOT NULL,
+    paternoC VARCHAR(100) NOT NULL,
+    maternoC VARCHAR(100) NOT NULL,
+    celularC VARCHAR(9) NOT NULL,
+    idReferencia INT NULL,
+    CONSTRAINT FK_Cliente_Referido FOREIGN KEY (idReferencia) REFERENCES Cliente(idC)
+) ENGINE=InnoDB;
+
+CREATE TABLE Empleado (
+    idE INT AUTO_INCREMENT PRIMARY KEY,
+    tipoDocumentE VARCHAR(20) NOT NULL,
+    nroDocumentE VARCHAR(20) NOT NULL,
+    nombresE VARCHAR(100) NOT NULL,
+    paternoE VARCHAR(100) NOT NULL,
+    maternoE VARCHAR(100) NOT NULL,
+    celularE VARCHAR(9) NOT NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE Cuenta (
+    idCuenta INT AUTO_INCREMENT PRIMARY KEY,
+    nroCuenta VARCHAR(20) NOT NULL,
+    saldoCuenta DECIMAL(10, 2) NOT NULL,
+    idB INT NOT NULL,
+    idC INT NOT NULL,
+    CONSTRAINT FK_Cuenta_Banco FOREIGN KEY (idB) REFERENCES Banco(idB),
+    CONSTRAINT FK_Cuenta_Cliente FOREIGN KEY (idC) REFERENCES Cliente(idC)
+) ENGINE=InnoDB;
+
+CREATE TABLE Operacion (
+    idOpe INT AUTO_INCREMENT PRIMARY KEY,
+    tipoOpe VARCHAR(50) NOT NULL,
+    fechaHoraOpe DATETIME NOT NULL,
+    montoOpe DECIMAL(10, 2) NOT NULL,
+    comisionOpe DECIMAL(10, 2) NOT NULL,
+    idCuenta INT NOT NULL,
+    idE INT NOT NULL,
+    idC INT NOT NULL,
+    CONSTRAINT FK_Operacion_Cuenta FOREIGN KEY (idCuenta) REFERENCES Cuenta(idCuenta),
+    CONSTRAINT FK_Operacion_Empleado FOREIGN KEY (idE) REFERENCES Empleado(idE),
+    CONSTRAINT FK_Operacion_Cliente FOREIGN KEY (idC) REFERENCES Cliente(idC)
+) ENGINE=InnoDB;
+
+-- 3. Inserción de datos
+INSERT INTO Banco (nombreB, paginaWebB) VALUES
+('Banco de Crédito del Perú', 'www.viabcp.com'),
+('BBVA Continental', 'www.bbva.pe'),
+('Interbank', 'www.interbank.pe'),
+('Scotiabank Perú', 'www.scotiabank.com.pe'),
+('Banco de la Nación', 'www.bn.com.pe');
+
+INSERT INTO Cliente (tipoDocumentC, nroDocumentC, nombresC, paternoC, maternoC, celularC, idReferencia) VALUES
+('DNI', '12345678', 'Juan', 'Perez', 'Gomez', '987654321', NULL),
+('DNI', '87654321', 'Maria', 'Lopez', 'Martinez', '976543210', NULL),
+('DNI', '45678912', 'Carlos', 'Rodriguez', 'Silva', '965432109', NULL),
+('DNI', '78912345', 'Ana', 'Garcia', 'Torres', '954321098', NULL),
+('DNI', '32165498', 'Pedro', 'Sanchez', 'Vega', '943210987', NULL);
+
+INSERT INTO Empleado (tipoDocumentE, nroDocumentE, nombresE, paternoE, maternoE, celularE) VALUES
+('DNI', '11111111', 'Carlos', 'Gutierrez', 'Luna', '911111111'),
+('DNI', '22222222', 'Ana', 'Martinez', 'Rios', '922222222'),
+('DNI', '33333333', 'Luis', 'Sanchez', 'Paredes', '933333333'),
+('DNI', '44444444', 'Diana', 'Vega', 'Cruz', '944444444'),
+('DNI', '55555555', 'Jorge', 'Ramos', 'Quispe', '955555555');
+
+INSERT INTO Cuenta (nroCuenta, saldoCuenta, idB, idC) VALUES
+('1912345678901', 5000.00, 1, 1),
+('1912345678902', 3500.50, 1, 2),
+('0011234567890123', 8200.75, 2, 3),
+('0011234567890124', 2100.25, 2, 4),
+('0034567890123', 12500.00, 3, 5);
+
+INSERT INTO Operacion (tipoOpe, fechaHoraOpe, montoOpe, comisionOpe, idCuenta, idE, idC) VALUES
+('Depósito', '2026-03-01 09:30:00', 1000.00, 0.00, 1, 1, 1),
+('Retiro', '2026-03-01 10:15:00', 500.00, 5.00, 1, 1, 1),
+('Depósito', '2026-03-01 11:45:00', 2000.00, 0.00, 2, 2, 2),
+('Transferencia', '2026-03-02 09:00:00', 800.00, 8.00, 3, 3, 3),
+('Depósito', '2026-03-02 14:20:00', 1500.00, 0.00, 4, 4, 4);
+
+-- 4. Verificación final
+SELECT 'BANCO' AS Tabla, COUNT(*) AS Cantidad FROM Banco
+UNION ALL
+SELECT 'CLIENTE', COUNT(*) FROM Cliente
+UNION ALL
+SELECT 'EMPLEADO', COUNT(*) FROM Empleado
+UNION ALL
+SELECT 'CUENTA', COUNT(*) FROM Cuenta
+UNION ALL
+SELECT 'OPERACION', COUNT(*) FROM Operacion;
