@@ -1,0 +1,72 @@
+-- 1. Limpieza de tablas previas en ejercicio4
+SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS Detalle;
+DROP TABLE IF EXISTS Comprobante;
+DROP TABLE IF EXISTS Producto;
+DROP TABLE IF EXISTS Categoria;
+DROP TABLE IF EXISTS Cliente;
+SET FOREIGN_KEY_CHECKS = 1;
+
+-- 2. Creación de tablas (sin crear base de datos nueva)
+CREATE TABLE Cliente (
+    idC INT AUTO_INCREMENT PRIMARY KEY,
+    tipoDocumC VARCHAR(20) NOT NULL,
+    nroDocumC VARCHAR(20) NOT NULL,
+    nombresC VARCHAR(100) NOT NULL,
+    paternoC VARCHAR(100) NOT NULL,
+    maternoC VARCHAR(100) NOT NULL,
+    celularC VARCHAR(9) NOT NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE Categoria (
+    idCat INT AUTO_INCREMENT PRIMARY KEY,
+    nombreCat VARCHAR(100) NOT NULL,
+    descripcionCat VARCHAR(200) NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE Producto (
+    idP INT AUTO_INCREMENT PRIMARY KEY,
+    nombreP VARCHAR(100) NOT NULL,
+    descripcionP VARCHAR(200) NULL,
+    precioReferencialP DECIMAL(10, 2) NOT NULL,
+    idCat INT NOT NULL,
+    CONSTRAINT FK_Producto_Categoria FOREIGN KEY (idCat) REFERENCES Categoria(idCat)
+) ENGINE=InnoDB;
+
+CREATE TABLE Comprobante (
+    idComp INT AUTO_INCREMENT PRIMARY KEY,
+    fechaHoraComp DATETIME NOT NULL,
+    totalComp DECIMAL(10, 2) NOT NULL,
+    idC INT NOT NULL,
+    CONSTRAINT FK_Comprobante_Cliente FOREIGN KEY (idC) REFERENCES Cliente(idC)
+) ENGINE=InnoDB;
+
+CREATE TABLE Detalle (
+    idDet INT AUTO_INCREMENT PRIMARY KEY,
+    cantidadDet INT NOT NULL,
+    precioRealUnitarioDet DECIMAL(10, 2) NOT NULL,
+    subtotalDet DECIMAL(10, 2) NOT NULL,
+    idComp INT NOT NULL,
+    idP INT NOT NULL,
+    CONSTRAINT FK_Detalle_Comprobante FOREIGN KEY (idComp) REFERENCES Comprobante(idComp),
+    CONSTRAINT FK_Detalle_Producto FOREIGN KEY (idP) REFERENCES Producto(idP)
+) ENGINE=InnoDB;
+
+-- 3. Inserción de Datos Reales
+INSERT INTO Cliente (tipoDocumC, nroDocumC, nombresC, paternoC, maternoC, celularC) VALUES
+('DNI', '12345678', 'Juan', 'Perez', 'Gomez', '987654321'),
+('DNI', '87654321', 'Maria', 'Lopez', 'Martinez', '976543210');
+
+INSERT INTO Categoria (nombreCat, descripcionCat) VALUES
+('Parrillas', 'Pollos y carnes a la parrilla'),
+('Bebidas Calientes', 'Café, té, chocolate');
+
+INSERT INTO Producto (nombreP, descripcionP, precioReferencialP, idCat) VALUES
+('Pollo Entero', 'Pollo entero a la brasa con papas y ensalada', 85.00, 1),
+('Café Americano', 'Café americano caliente', 8.00, 2);
+
+INSERT INTO Comprobante (fechaHoraComp, totalComp, idC) VALUES
+('2026-03-01 12:30:00', 85.00, 1);
+
+INSERT INTO Detalle (cantidadDet, precioRealUnitarioDet, subtotalDet, idComp, idP) VALUES
+(1, 85.00, 85.00, 1, 1);

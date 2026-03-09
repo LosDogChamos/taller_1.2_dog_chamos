@@ -1,0 +1,162 @@
+use master 
+go
+
+-- crear la base de datos SuperGiros, debemos verificar que no exista; si existe la base de datos, se tiene que dropear
+if DB_ID('SuperGiros') is not null
+	drop database SuperGiros
+go
+
+create database SuperGiros
+go
+use SuperGiros
+go
+
+-- crear tabla Banco (destruir la tabla si existe)
+if OBJECT_ID ('Banco') is not null
+	drop table Banco
+go
+create table Banco
+(
+	idB int primary key identity(1, 1),
+	nombreB varchar(100) not null,
+	paginaWebB varchar(200) null
+)
+go
+
+-- crear tabla Cliente (destruir la tabla si existe)
+if OBJECT_ID ('Cliente') is not null
+	drop table Cliente
+go
+create table Cliente
+(
+	idC int primary key identity(1, 1),
+	tipoDocumentC varchar(20) not null,
+	nroDocumentC varchar(20) not null,
+	nombresC varchar(100) not null,
+	paternoC varchar(100) not null,
+	maternoC varchar(100) not null,
+	celularC varchar(9) not null,
+	idReferencia int null,
+	constraint FK_Cliente_Referido
+	foreign key (idReferencia) references Cliente(idC)
+)
+go
+
+-- crear tabla Empleado (destruir la tabla si existe)
+if OBJECT_ID ('Empleado') is not null
+	drop table Empleado
+go
+create table Empleado
+(
+	idE int primary key identity(1, 1),
+	tipoDocumentE varchar(20) not null,
+	nroDocumentE varchar(20) not null,
+	nombresE varchar(100) not null,
+	paternoE varchar(100) not null,
+	maternoE varchar(100) not null,
+	celularE varchar(9) not null
+)
+go
+
+-- crear tabla Cuenta (destruir la tabla si existe)
+if OBJECT_ID ('Cuenta') is not null
+	drop table Cuenta
+go
+create table Cuenta
+(
+	idCuenta int primary key identity(1, 1),
+	nroCuenta varchar(20) not null,
+	saldoCuenta decimal(10, 2) not null,
+	idB int not null,
+	idC int not null,
+	constraint FK_Cuenta_Banco
+	foreign key (idB) references Banco(idB),
+	constraint FK_Cuenta_Cliente
+	foreign key (idC) references Cliente(idC)
+)
+go
+
+-- crear tabla Operacion (destruir la tabla si existe)
+if OBJECT_ID ('Operacion') is not null
+	drop table Operacion
+go
+create table Operacion
+(
+	idOpe int primary key identity(1, 1),
+	tipoOpe varchar(50) not null,
+	fechaHoraOpe datetime not null,
+	montoOpe decimal(10, 2) not null,
+	comisionOpe decimal(10, 2) not null,
+	idCuenta int not null,
+	idE int not null,
+	idC int not null,  -- CONEXION DIRECTA CLIENTE - OPERACION
+	constraint FK_Operacion_Cuenta
+	foreign key (idCuenta) references Cuenta(idCuenta),
+	constraint FK_Operacion_Empleado
+	foreign key (idE) references Empleado(idE),
+	constraint FK_Operacion_Cliente
+	foreign key (idC) references Cliente(idC)  -- Cliente que realiza la operacion
+)
+go
+
+DELETE FROM Operacion
+go
+DELETE FROM Cuenta
+go
+DELETE FROM Empleado
+go
+DELETE FROM Cliente
+go
+DELETE FROM Banco
+go
+
+INSERT INTO Banco (nombreB, paginaWebB) VALUES
+('Banco de Crédito del Perú', 'www.viabcp.com'),
+('BBVA Continental', 'www.bbva.pe'),
+('Interbank', 'www.interbank.pe'),
+('Scotiabank Perú', 'www.scotiabank.com.pe'),
+('Banco de la Nación', 'www.bn.com.pe')
+go
+
+INSERT INTO Cliente (tipoDocumentC, nroDocumentC, nombresC, paternoC, maternoC, celularC, idReferencia) VALUES
+('DNI', '12345678', 'Juan', 'Perez', 'Gomez', '987654321', NULL),
+('DNI', '87654321', 'Maria', 'Lopez', 'Martinez', '976543210', NULL),
+('DNI', '45678912', 'Carlos', 'Rodriguez', 'Silva', '965432109', NULL),
+('DNI', '78912345', 'Ana', 'Garcia', 'Torres', '954321098', NULL),
+('DNI', '32165498', 'Pedro', 'Sanchez', 'Vega', '943210987', NULL)
+go
+
+INSERT INTO Empleado (tipoDocumentE, nroDocumentE, nombresE, paternoE, maternoE, celularE) VALUES
+('DNI', '11111111', 'Carlos', 'Gutierrez', 'Luna', '911111111'),
+('DNI', '22222222', 'Ana', 'Martinez', 'Rios', '922222222'),
+('DNI', '33333333', 'Luis', 'Sanchez', 'Paredes', '933333333'),
+('DNI', '44444444', 'Diana', 'Vega', 'Cruz', '944444444'),
+('DNI', '55555555', 'Jorge', 'Ramos', 'Quispe', '955555555')
+go
+
+INSERT INTO Cuenta (nroCuenta, saldoCuenta, idB, idC) VALUES
+('1912345678901', 5000.00, 1, 1),
+('1912345678902', 3500.50, 1, 2),
+('0011234567890123', 8200.75, 2, 3),
+('0011234567890124', 2100.25, 2, 4),
+('0034567890123', 12500.00, 3, 5)
+go
+
+INSERT INTO Operacion (tipoOpe, fechaHoraOpe, montoOpe, comisionOpe, idCuenta, idE, idC) VALUES
+('Depósito', '2026-03-01 09:30:00', 1000.00, 0.00, 1, 1, 1),
+('Retiro', '2026-03-01 10:15:00', 500.00, 5.00, 1, 1, 1),
+('Depósito', '2026-03-01 11:45:00', 2000.00, 0.00, 2, 2, 2),
+('Transferencia', '2026-03-02 09:00:00', 800.00, 8.00, 3, 3, 3),
+('Depósito', '2026-03-02 14:20:00', 1500.00, 0.00, 4, 4, 4)
+go
+
+SELECT 'BANCO' AS Tabla, * FROM Banco
+go
+SELECT 'CLIENTE' AS Tabla, * FROM Cliente
+go
+SELECT 'EMPLEADO' AS Tabla, * FROM Empleado
+go
+SELECT 'CUENTA' AS Tabla, * FROM Cuenta
+go
+SELECT 'OPERACION' AS Tabla, * FROM Operacion
+go

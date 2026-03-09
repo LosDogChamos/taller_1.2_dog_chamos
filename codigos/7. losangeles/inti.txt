@@ -1,0 +1,125 @@
+-- =================================
+-- ELIMINAR TABLAS SI EXISTEN
+-- =================================
+DROP TABLE IF EXISTS Detalle CASCADE;
+DROP TABLE IF EXISTS Comprobante CASCADE;
+DROP TABLE IF EXISTS Producto CASCADE;
+DROP TABLE IF EXISTS Cliente CASCADE;
+DROP TABLE IF EXISTS Categoria CASCADE;
+
+-- =================================
+-- TABLA CATEGORIA
+-- =================================
+CREATE TABLE Categoria (
+    idCat SERIAL PRIMARY KEY,
+    nombreCat VARCHAR(100) NOT NULL,
+    descripcionCat VARCHAR(250) NULL
+);
+
+-- =================================
+-- TABLA PRODUCTO
+-- =================================
+CREATE TABLE Producto (
+    idP SERIAL PRIMARY KEY,
+    nombreP VARCHAR(100) NOT NULL,
+    descripcionP VARCHAR(250) NULL,
+    precioReferencialP DECIMAL(10, 2) NOT NULL,
+    idCat INTEGER NOT NULL,
+    CONSTRAINT FK_Producto_Categoria
+    FOREIGN KEY (idCat) REFERENCES Categoria(idCat)
+);
+
+-- =================================
+-- TABLA CLIENTE
+-- =================================
+CREATE TABLE Cliente (
+    idC SERIAL PRIMARY KEY,
+    tipoDocumC VARCHAR(20) NOT NULL,
+    nroDocumC VARCHAR(20) NOT NULL,
+    nombresC VARCHAR(100) NOT NULL,
+    paternoC VARCHAR(100) NOT NULL,
+    maternoC VARCHAR(100) NOT NULL,
+    celularC VARCHAR(9) NOT NULL
+);
+
+-- =================================
+-- TABLA COMPROBANTE
+-- =================================
+CREATE TABLE Comprobante (
+    idComp SERIAL PRIMARY KEY,
+    fechaHoraComp TIMESTAMP NOT NULL,
+    totalComp DECIMAL(10, 2) NOT NULL,
+    idC INTEGER NOT NULL,
+    CONSTRAINT FK_Comprobante_Cliente
+    FOREIGN KEY (idC) REFERENCES Cliente(idC)
+);
+
+-- =================================
+-- TABLA DETALLE
+-- =================================
+CREATE TABLE Detalle (
+    idDet SERIAL PRIMARY KEY,
+    cantidadDet INTEGER NOT NULL,
+    precioRealUnitarioDet DECIMAL(10, 2) NOT NULL,
+    subtotalDet DECIMAL(10, 2) NOT NULL,
+    idComp INTEGER NOT NULL,
+    idP INTEGER NOT NULL,
+    CONSTRAINT FK_Detalle_Comprobante
+    FOREIGN KEY (idComp) REFERENCES Comprobante(idComp),
+    CONSTRAINT FK_Detalle_Producto
+    FOREIGN KEY (idP) REFERENCES Producto(idP)
+);
+
+-- =================================
+-- INSERTAR DATOS
+-- =================================
+INSERT INTO Categoria (nombreCat, descripcionCat) VALUES
+('Electrónica', 'Productos electrónicos y gadgets'),
+('Ropa', 'Prendas de vestir para todas las edades'),
+('Hogar', 'Artículos para el hogar y decoración'),
+('Deportes', 'Equipamiento y ropa deportiva'),
+('Libros', 'Libros y material de lectura');
+
+INSERT INTO Producto (nombreP, descripcionP, precioReferencialP, idCat) VALUES
+('Smartphone X', 'Teléfono de última generación', 1500.00, 1),
+('Laptop Pro', 'Laptop para profesionales', 3200.00, 1),
+('Camisa casual', 'Camisa de algodón para hombre', 89.90, 2),
+('Vestido verano', 'Vestido ligero para dama', 129.90, 2),
+('Juego de sábanas', 'Sábanas de 3 piezas', 159.90, 3),
+('Pelota fútbol', 'Pelota profesional', 79.90, 4),
+('Libro SQL', 'Aprende SQL desde cero', 65.00, 5);
+
+INSERT INTO Cliente (tipoDocumC, nroDocumC, nombresC, paternoC, maternoC, celularC) VALUES
+('DNI', '12345678', 'Juan', 'Perez', 'Gomez', '987654321'),
+('DNI', '87654321', 'Maria', 'Lopez', 'Martinez', '976543210'),
+('DNI', '45678912', 'Carlos', 'Rodriguez', 'Silva', '965432109'),
+('DNI', '78912345', 'Ana', 'Garcia', 'Torres', '954321098'),
+('DNI', '32165498', 'Pedro', 'Sanchez', 'Vega', '943210987');
+
+INSERT INTO Comprobante (fechaHoraComp, totalComp, idC) VALUES
+('2024-01-15 10:30:00', 1589.90, 1),
+('2024-01-16 14:20:00', 219.80, 2),
+('2024-01-17 09:15:00', 3225.00, 3),
+('2024-01-18 16:45:00', 159.90, 4),
+('2024-01-19 11:30:00', 450.00, 5);
+
+INSERT INTO Detalle (cantidadDet, precioRealUnitarioDet, subtotalDet, idComp, idP) VALUES
+(1, 1500.00, 1500.00, 1, 1),
+(1, 89.90, 89.90, 1, 3),
+(2, 65.00, 130.00, 2, 7),
+(1, 89.90, 89.90, 2, 3),
+(1, 3200.00, 3200.00, 3, 2),
+(1, 25.00, 25.00, 3, 5),
+(1, 159.90, 159.90, 4, 5),
+(1, 79.90, 79.90, 5, 6),
+(2, 129.90, 259.80, 5, 4),
+(1, 110.30, 110.30, 5, 3);
+
+-- =================================
+-- CONSULTAS
+-- =================================
+SELECT 'CATEGORIA' AS Tabla, * FROM Categoria;
+SELECT 'PRODUCTO' AS Tabla, * FROM Producto;
+SELECT 'CLIENTE' AS Tabla, * FROM Cliente;
+SELECT 'COMPROBANTE' AS Tabla, * FROM Comprobante;
+SELECT 'DETALLE' AS Tabla, * FROM Detalle;

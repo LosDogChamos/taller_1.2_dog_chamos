@@ -1,0 +1,134 @@
+use master 
+go
+
+-- crear la base de datos AsistenciaLaboral, debemos verificar que no exista; si existe la base de datos, se tiene que dropear
+if DB_ID('AsistenciaLaboral') is not null
+	drop database AsistenciaLaboral
+go
+
+create database AsistenciaLaboral
+go
+use AsistenciaLaboral
+go
+
+-- crear tabla Año (destruir la tabla si existe)
+if OBJECT_ID ('Año') is not null
+	drop table Año
+go
+create table Año
+(
+	idAño int primary key identity(1, 1),
+	inicioAño date not null,
+	finAño date not null
+)
+go
+
+-- crear tabla Turno (destruir la tabla si existe)
+if OBJECT_ID ('Turno') is not null
+	drop table Turno
+go
+create table Turno
+(
+	idT int primary key identity(1, 1),
+	nombreT varchar(50) not null,
+	inicioT time not null,
+	finT time not null,
+	idAño int not null,
+	constraint FK_Turno_Año
+	foreign key (idAño) references Año(idAño)
+)
+go
+
+-- crear tabla Empleado (destruir la tabla si existe)
+if OBJECT_ID ('Empleado') is not null
+	drop table Empleado
+go
+create table Empleado
+(
+	idE int primary key identity(1, 1),
+	tipoDocumento varchar(20) not null,
+	nroDocumento varchar(20) not null,
+	nombresE varchar(100) not null,
+	paternoE varchar(100) not null,
+	maternoE varchar(100) not null,
+	celularE varchar(9) not null,
+	idSupervisor int null,
+	constraint FK_Empleado_Supervisor
+	foreign key (idSupervisor) references Empleado(idE)
+)
+go
+
+-- crear tabla Asistencia (destruir la tabla si existe)
+if OBJECT_ID ('Asistencia') is not null
+	drop table Asistencia
+go
+create table Asistencia
+(
+	idA int primary key identity(1, 1),
+	fechaA date not null,
+	diaA varchar(15) not null,
+	esFeriadoA bit not null,
+	asistioA bit not null,
+	tardoA bit not null,
+	horaEntradaA time null,
+	horaSalidaA time null,
+	idE int not null,
+	idT int not null,
+	constraint FK_Asistencia_Empleado
+	foreign key (idE) references Empleado(idE),
+	constraint FK_Asistencia_Turno
+	foreign key (idT) references Turno(idT)
+)
+go
+
+DELETE FROM Asistencia
+go
+DELETE FROM Empleado
+go
+DELETE FROM Turno
+go
+DELETE FROM Año
+go
+
+INSERT INTO Año (inicioAño, finAño) VALUES
+('2026-01-01', '2026-12-31'),
+('2025-01-01', '2025-12-31')
+go
+
+INSERT INTO Turno (nombreT, inicioT, finT, idAño) VALUES
+('Mañana', '08:00:00', '16:00:00', 1),
+('Tarde', '14:00:00', '22:00:00', 1),
+('Noche', '22:00:00', '06:00:00', 1),
+('Mañana', '08:00:00', '16:00:00', 2),
+('Tarde', '14:00:00', '22:00:00', 2),
+('Noche', '22:00:00', '06:00:00', 2)
+go
+
+INSERT INTO Empleado (tipoDocumento, nroDocumento, nombresE, paternoE, maternoE, celularE, idSupervisor) VALUES
+('DNI', '12345678', 'Juan', 'Perez', 'Gomez', '987654321', NULL),
+('DNI', '87654321', 'Maria', 'Lopez', 'Martinez', '976543210', 1),
+('DNI', '45678912', 'Carlos', 'Rodriguez', 'Silva', '965432109', 1),
+('DNI', '78912345', 'Ana', 'Garcia', 'Torres', '954321098', 2),
+('DNI', '32165498', 'Pedro', 'Sanchez', 'Vega', '943210987', 2)
+go
+
+INSERT INTO Asistencia (fechaA, diaA, esFeriadoA, asistioA, tardoA, horaEntradaA, horaSalidaA, idE, idT) VALUES
+('2026-03-01', 'Lunes', 0, 1, 0, '08:00:00', '16:00:00', 1, 1),
+('2026-03-01', 'Lunes', 0, 1, 0, '08:05:00', '16:00:00', 2, 1),
+('2026-03-01', 'Lunes', 0, 1, 1, '14:10:00', '22:00:00', 3, 2),
+('2026-03-02', 'Martes', 0, 1, 0, '08:00:00', '16:00:00', 1, 1),
+('2026-03-02', 'Martes', 0, 0, 0, NULL, NULL, 2, 1),
+('2026-03-02', 'Martes', 0, 1, 0, '14:00:00', '22:00:00', 3, 2),
+('2026-03-03', 'Miércoles', 0, 1, 0, '08:00:00', '16:00:00', 1, 1),
+('2026-03-03', 'Miércoles', 0, 1, 1, '08:15:00', '16:00:00', 2, 1),
+('2026-03-03', 'Miércoles', 0, 1, 0, '14:00:00', '22:00:00', 3, 2)
+go
+
+SELECT 'AÑO' AS Tabla, * FROM Año
+go
+SELECT 'TURNO' AS Tabla, * FROM Turno
+go
+SELECT 'EMPLEADO' AS Tabla, * FROM Empleado
+go
+SELECT 'ASISTENCIA' AS Tabla, * FROM Asistencia
+go
